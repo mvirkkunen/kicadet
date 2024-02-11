@@ -1,0 +1,7 @@
+*.pyc
+**/*.kicad_mod
+**/*.kicad_pcb
+**/*.kicad_sch
+**/*.kicad_sym
+**/fp-info-cache
+**/*-backups/
