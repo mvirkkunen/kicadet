@@ -1,4 +1,5 @@
 from .impl.pcb import (
+    Arc,
     Circle,
     GeneralSettings,
     LayerType,

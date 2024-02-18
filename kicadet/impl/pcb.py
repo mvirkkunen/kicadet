@@ -281,6 +281,27 @@ class TrackVia(Node):
     ) -> None:
         super().__init__(locals())
 
+class Arc(Node):
+    node_name = "gr_arc"
+
+    start: Annotated[Vec2, Attr.Transform]
+    mid: Annotated[Vec2, Attr.Transform]
+    end: Annotated[Vec2, Attr.Transform]
+    width: float
+    layer: str
+    tstamp: Uuid
+
+    def __init__(
+            self,
+            start: ToVec2,
+            mid: ToVec2,
+            end: ToVec2,
+            width: float,
+            layer: str,
+            tstamp: Uuid = NEW_INSTANCE,
+    ) -> None:
+        super().__init__(locals())
+
 class Rect(Node):
     node_name = "gr_rect"
 
@@ -321,7 +342,7 @@ class Circle(Node):
 
         super().__init__(locals())
 
-GraphicsItems = (Circle, Footprint, Net, Rect, Rotate, TrackArc, TrackSegment, TrackVia, Transform)
+GraphicsItems = (fp.Footprint, Net, Arc, Circle, Rect, Rotate, TrackArc, TrackSegment, TrackVia, Transform)
 Rotate.child_types = GraphicsItems
 Transform.child_types = GraphicsItems
 
