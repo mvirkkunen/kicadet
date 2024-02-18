@@ -1,4 +1,4 @@
-from .impl.schematic import (
+from kicadet.impl.schematic import (
     Bus,
     GlobalLabel,
     Junction,
