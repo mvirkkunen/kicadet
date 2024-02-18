@@ -23,7 +23,7 @@ class Property(Node):
             self,
             name: str,
             value: str,
-            at: Pos2,
+            at: ToPos2,
             effects: TextEffects = NEW_INSTANCE,
     ) -> None:
         """

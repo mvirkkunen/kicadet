@@ -8,6 +8,7 @@ from kicadet.impl.symbol import(
     PinNumber,
     PinNumbers,
     PolyLine,
+    Property,
     Rectangle,
     Symbol,
     SymbolLibrary,
