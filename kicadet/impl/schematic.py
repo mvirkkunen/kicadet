@@ -290,6 +290,7 @@ class SchematicFile(ContainerNode, NodeLoadSaveMixin):
             sym: symbol.Symbol,
             reference: str,
             at: Pos2,
+            value: Optional[str] = None,
             mirror: Optional[Mirror] = None,
             footprint: Optional[str | LibraryFootprint] = None,
             in_bom: Optional[bool] = None,
@@ -340,6 +341,8 @@ class SchematicFile(ContainerNode, NodeLoadSaveMixin):
                     sprop.value = f"{footprint.library_name}:{footprint.name}"
             elif sprop.name == symbol.Property.Reference:
                 sprop.value = reference
+            elif sprop.name == symbol.Property.Value and value is not None:
+                sprop.value = value
 
             sprop.at = Pos2(Vec2(at)) + sprop.at.flip_y()
             ssym.append(sprop)
