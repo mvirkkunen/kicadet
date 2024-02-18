@@ -48,7 +48,7 @@ class PcbLayers(ContainerNode):
     node_name = "layers"
     child_types = (PcbLayer,)
 
-    default_non_signal_layers: ClassVar[list[tuple[str, LayerType, Optional[str]]]] = [
+    default_non_copper_layers: ClassVar[list[tuple[str, LayerType, Optional[str]]]] = [
         (Layer.BAdhes, LayerType.User, "B.Adhesive"),
         (Layer.FAdhes, LayerType.User, "F.Adhesive"),
         (Layer.BPaste, LayerType.User, None),
@@ -80,39 +80,144 @@ class PcbLayers(ContainerNode):
 
     def __init__(
             self,
-            children: list[PcbLayer]
+            children: Optional[list[PcbLayer]] = None,
     ) -> None:
         super().__init__(locals())
 
     @staticmethod
-    def generate_layers(num_signal_layers: int) -> "PcbLayers":
-        r = []
+    def generate_layers(num_copper_layers: int) -> "PcbLayers":
+        """Generates layer list with KiCad defaults"""
+
+        if num_copper_layers % 2 != 0 or not (1 <= num_copper_layers <= 32):
+            raise ValueError(f"Don't know how to generate a board setup with {num_copper_layers} copper layers")
+
+        layers = PcbLayers()
 
         ordinal = 0
-        if num_signal_layers > 0:
-            r.append(PcbLayer(ordinal, Layer.FCu, LayerType.Signal))
-            ordinal += 1
 
-        if num_signal_layers > 2:
-            for i in range(1, num_signal_layers - 1):
-                r.append(PcbLayer(ordinal, f"In{i}.Cu", LayerType.Signal))
+        layers.append(PcbLayer(ordinal, Layer.FCu, LayerType.Signal))
+        ordinal += 1
+
+        if num_copper_layers > 2:
+            for i in range(1, num_copper_layers - 1):
+                layers.append(PcbLayer(ordinal, f"In{i}.Cu", LayerType.Signal))
                 ordinal += 1
-
         ordinal = max(ordinal, 31)
 
-        if num_signal_layers > 1:
-            r.append(PcbLayer(ordinal, Layer.BCu, LayerType.Signal))
+        if num_copper_layers > 1:
+            layers.append(PcbLayer(ordinal, Layer.BCu, LayerType.Signal))
             ordinal += 1
 
-        for attrs in PcbLayers.default_non_signal_layers:
-            r.append(PcbLayer(ordinal, *attrs))
+        for attrs in PcbLayers.default_non_copper_layers:
+            layers.append(PcbLayer(ordinal, *attrs))
             ordinal += 1
 
-        return PcbLayers(r)
+        return layers
+
+class StackupColor:
+    Black = "Black"
+    White = "White"
+
+class StackupLayer(Node):
+    node_name = "layer"
+
+    name: Annotated[str, Attr.Positional]
+    type: str
+    color: Optional[str]
+    thickness: Optional[float]
+    material: Optional[str]
+    epsilon_r: Optional[float]
+    loss_tangent: Optional[float]
+
+    def __init__(
+            self,
+            name: str,
+            type: str,
+            color: Optional[str] = None,
+            thickness: Optional[float] = None,
+            material: Optional[str] = None,
+            epsilon_r: Optional[float] = None,
+            loss_tangent: Optional[float] = None,
+    ):
+        super().__init__(locals())
+
+class Stackup(ContainerNode):
+    node_name = "stackup"
+    child_types = (StackupLayer),
+
+    copper_finish: Optional[str]
+
+    def __init__(
+            self,
+            children: Optional[list[StackupLayer]] = None,
+            copper_finish: Optional[str] = None):
+        super().__init__(locals())
+
+    @staticmethod
+    def generate_stackup(
+            num_copper_layers: int,
+            thickness: float = 1.6,
+            copper_thickness: float = 0.035,
+            prepreg_thickness: float = 0.1,
+            mask_thickness: float = 0.01,
+            mask_color: Optional[str] = None,
+            silkscreen_color: Optional[str] = None) -> "Stackup":
+        """Generates board stackup with KiCad defaults"""
+
+        if not (1 <= num_copper_layers <= 32) or (num_copper_layers >= 2 and num_copper_layers % 2 != 0):
+            raise ValueError(f"Don't know how to generate a board stackup with {num_copper_layers} copper layers")
+
+        stackup = Stackup()
+
+        core_thickness = thickness - (
+            (mask_thickness * (2 if num_copper_layers >= 2 else 1))
+            + (copper_thickness * num_copper_layers)
+            + (prepreg_thickness * ((num_copper_layers - 2) if num_copper_layers >= 2 else 0))
+        )
+
+        if core_thickness <= 0:
+            raise ValueError(f"Your settings would result in a board with a non-positive thickness")
+
+        stackup.append(StackupLayer(Layer.FSilkS, "Top Silk Screen", color=silkscreen_color))
+        stackup.append(StackupLayer(Layer.FPaste, "Top Solder Paste"))
+        stackup.append(StackupLayer(Layer.FMask, "Top Solder Mask", color=mask_color, thickness=0.01))
+
+        dielectric_id = 1
+
+        for i in range(num_copper_layers):
+            if i == 0:
+                layer = Layer.FCu
+            elif i == num_copper_layers - 1:
+                layer = Layer.BCu
+            else:
+                layer = f"In{i}.Cu"
+
+            stackup.append(StackupLayer(layer, "copper", thickness=0.035))
+
+            d_type, d_thickness = None, None
+            if i == max((num_copper_layers // 2) - 1, 0):
+                d_type = "core"
+                d_thickness = core_thickness
+            elif i < num_copper_layers - 1:
+                d_type = "prepreg"
+                d_thickness = prepreg_thickness
+
+            if d_type:
+                stackup.append(StackupLayer(f"dielectric {dielectric_id}", d_type, thickness=d_thickness, material="FR4", epsilon_r=4.5, loss_tangent=0.02))
+                dielectric_id += 1
+
+        if num_copper_layers >= 2:
+            stackup.append(StackupLayer(Layer.BMask, "Bottom Solder Mask", color=mask_color, thickness=0.01))
+            stackup.append(StackupLayer(Layer.BPaste, "Bottom Solder Paste"))
+            stackup.append(StackupLayer(Layer.BSilkS, "Bottom Silk Screen", color=silkscreen_color))
+
+        return stackup
+
 
 class Setup(Node):
     node_name = "setup"
 
+    stackup: Optional[Stackup]
     pad_to_mask_clearance: float
     solder_mask_min_width: Optional[float]
     pad_to_paste_clearance: Optional[float]
@@ -361,6 +466,8 @@ class PcbFile(ContainerNode, NodeLoadSaveMixin):
         self,
         layers: PcbLayers | list[PcbLayer] | int = 2,
         thickness: float = 1.6,
+        mask_color: Optional[str] = None,
+        silkscreen_color: Optional[str] = None,
         page: Optional[PageSettings] = None,
         setup: Optional[Setup] = NEW_INSTANCE,
         version: int = KICADET_VERSION,
@@ -369,8 +476,15 @@ class PcbFile(ContainerNode, NodeLoadSaveMixin):
         if isinstance(layers, list):
             layers = PcbLayers(layers)
 
-        if not isinstance(layers, PcbLayers):
-            layers = PcbLayers.generate_layers(layers)
+        if isinstance(layers, int):
+            num_copper_layers = layers
+            layers = PcbLayers.generate_layers(num_copper_layers)
+
+            if not setup or setup is NEW_INSTANCE:
+                setup = Setup()
+
+            if not setup.stackup:
+                setup.stackup = Stackup.generate_stackup(num_copper_layers, thickness=thickness, mask_color=mask_color, silkscreen_color=silkscreen_color)
 
         general = GeneralSettings(thickness=thickness)
         page = page or PageSettings(PaperSize.A4)
@@ -396,16 +510,12 @@ class PcbFile(ContainerNode, NodeLoadSaveMixin):
             at: ToPos2,
             layer: str,
             path: Optional[str] = None,
-            symbol: Optional[SchematicSymbol] = None,
+            symbol: Optional[sch.SchematicSymbol] = None,
             library_link: Optional[str] = None,
             parent: Optional[ContainerNode] = None,
     ) -> fp.Footprint:
         """
-        Places a footprint symbol onto the PCB.
-
-        :param footprint: The footprint to place
-        :param at: Position and rotation angle for the symbol.
-        :returns: a SchematicSymbol instance
+        Places a footprint onto the PCB.
         """
 
         if not layer in (Layer.FCu, Layer.BCu):
@@ -445,10 +555,10 @@ class PcbFile(ContainerNode, NodeLoadSaveMixin):
                 (fp.TextType.Reference, sym.Property.Reference),
                 (fp.TextType.Value, sym.Property.Value)
             ]:
-                prop = pcb_fp.find_one(fp.Text, lambda p: p.type == prop_type)
+                text = pcb_fp.find_one(fp.Text, lambda p: p.type == prop_type)
                 value = symbol.get_property(sym_prop_name)
-                if prop and value:
-                    prop.text = value
+                if text and value:
+                    text.text = value
 
         if layer == Layer.BCu:
             for pad in pcb_fp.find_all(fp.Pad):
