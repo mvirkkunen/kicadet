@@ -142,12 +142,17 @@ class Transform(BaseTransform):
 class Rotate(BaseRotate):
     pass
 
+class Mirror(SymbolEnum):
+    X = "x"
+    Y = "y"
+
 class SchematicSymbol(ContainerNode):
     child_types = (symbol.Property, Transform, SchematicSymbolPin)
     node_name = "symbol"
 
     lib_id: str
     at: Annotated[Pos2, Attr.Transform]
+    mirror: Optional[Mirror]
     unit: int
     in_bom: Annotated[bool, Attr.Bool.YesNo]
     on_board: Annotated[bool, Attr.Bool.YesNo]
@@ -161,6 +166,7 @@ class SchematicSymbol(ContainerNode):
             lib_id: str,
             at: Pos2,
             unit: int,
+            mirror: Optional[Mirror] = None,
             in_bom: bool = True,
             on_board: bool = True,
             dnp: bool = False,

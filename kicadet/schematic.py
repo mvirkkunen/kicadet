@@ -3,6 +3,7 @@ from .impl.schematic import (
     GlobalLabel,
     Junction,
     LabelShape,
+    Mirror,
     NoConnect,
     Rotate,
     SchematicFile,
