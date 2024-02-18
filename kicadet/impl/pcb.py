@@ -5,9 +5,8 @@ from ..node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
 from ..common import BaseRotate, BaseTransform, Generator, Layer, Net, PageSettings, PaperSize, Property, KICADET_GENERATOR, KICADET_VERSION
 from ..values import SymbolEnum, Pos2, ToPos2, ToVec2, Uuid, Vec2
 from .. import util
-from .footprint import Footprint, LibraryFootprint, Pad
-from .symbol import SymbolEnum, Property as SymbolProperty
 from .schematic import SchematicSymbol
+from . import footprint as fp, symbol as sym
 
 class Transform(BaseTransform): pass
 
@@ -373,13 +372,14 @@ class PcbFile(ContainerNode, NodeLoadSaveMixin):
 
     def place(
             self,
-            footprint: Footprint | LibraryFootprint,
+            footprint: fp.Footprint | fp.LibraryFootprint,
             at: ToPos2,
             layer: str,
-            path: Optional[str | SchematicSymbol] = None,
+            path: Optional[str] = None,
+            symbol: Optional[SchematicSymbol] = None,
             library_link: Optional[str] = None,
             parent: Optional[ContainerNode] = None,
-    ) -> Footprint:
+    ) -> fp.Footprint:
         """
         Places a footprint symbol onto the PCB.
 
@@ -399,15 +399,15 @@ class PcbFile(ContainerNode, NodeLoadSaveMixin):
 
         children: list[Node] = []
 
-        if isinstance(path, SchematicSymbol):
-            for prop in path.find_all(SymbolProperty, lambda p: p.name.startswith("ki_")):
+        if path is None and symbol is not None:
+            for prop in symbol.find_all(sym.Property, lambda p: p.name.startswith("ki_")):
                 children.append(Property(prop.name, prop.value))
 
-            path = f"/{path.uuid.value}"
+            path = f"/{symbol.uuid.value}"
 
         children.extend(c.clone() for c in footprint)
 
-        pcb_fp = Footprint(
+        pcb_fp = fp.Footprint(
             library_link=library_link,
             layer=layer,
             at=at,
@@ -420,8 +420,18 @@ class PcbFile(ContainerNode, NodeLoadSaveMixin):
 
         pcb_fp.unknown = copy.deepcopy(footprint.unknown)
 
+        if symbol:
+            for (prop_type, sym_prop_name) in [
+                (fp.TextType.Reference, sym.Property.Reference),
+                (fp.TextType.Value, sym.Property.Value)
+            ]:
+                prop = pcb_fp.find_one(fp.Text, lambda p: p.type == prop_type)
+                value = symbol.get_property(sym_prop_name)
+                if prop and value:
+                    prop.text = value
+
         if layer == Layer.BCu:
-            for pad in pcb_fp.find_all(Pad):
+            for pad in pcb_fp.find_all(fp.Pad):
                 pad.layers.layers = [Layer.flip(l) for l in pad.layers.layers]
 
         (parent or self).append(pcb_fp)
