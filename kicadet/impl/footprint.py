@@ -401,6 +401,9 @@ class Pad(ContainerNode):
     drill: Optional[DrillDefinition]
     layers: LayerRef
     roundrect_rratio: Optional[float]
+    solder_mask_margin: Optional[float]
+    solder_paste_margin: Optional[float]
+    solder_paste_margin_ratio: Optional[float]
     net: Optional[Net]
     tstamp: Uuid
 
@@ -414,6 +417,9 @@ class Pad(ContainerNode):
             layers: LayerRef | list[str],
             drill: Optional[DrillDefinition | float | int] = None,
             roundrect_rratio: Optional[float] = None,
+            solder_mask_margin: Optional[float] = None,
+            solder_paste_margin: Optional[float] = None,
+            solder_paste_margin_ratio: Optional[float] = None,
             net: Optional[Net] = None,
             locked: bool = False,
             tstamp: Uuid = NEW_INSTANCE,
@@ -476,6 +482,9 @@ class BaseFootprint(ContainerNode):
     layer: str
     descr: Optional[str]
     tags: Optional[str]
+    solder_mask_margin: Optional[float]
+    solder_paste_margin: Optional[float]
+    solder_paste_margin_ratio: Optional[float]
     attr: Optional[FootprintAttributes]
 
     def get_pad(self, number: str) -> Pad:
@@ -505,6 +514,9 @@ class Footprint(BaseFootprint):
         path: Optional[str] = None,
         descr: Optional[str] = None,
         tags: Optional[str] = None,
+        solder_mask_margin: Optional[float] = None,
+        solder_paste_margin: Optional[float] = None,
+        solder_paste_margin_ratio: Optional[float] = None,
         attr: Optional[FootprintAttributes] = None,
         tstamp: Uuid = NEW_INSTANCE,
         children: Optional[list] = None,
@@ -516,7 +528,7 @@ class Footprint(BaseFootprint):
             return super().transform_pos(self.at) + Pos2(pos)
         else:
             # Coordinates within footprints are relative to the footprint, except for rotation for some reason, so propagate only the rotation part
-            
+
             if self.parent:
                 return Pos2(pos).add_rotation(self.parent.transform_pos(self.at).r)
             else:
@@ -539,6 +551,9 @@ class LibraryFootprint(BaseFootprint, NodeLoadSaveMixin):
         layer: str,
         descr: Optional[str] = None,
         tags: Optional[str] = None,
+        solder_mask_margin: Optional[float] = None,
+        solder_paste_margin: Optional[float] = None,
+        solder_paste_margin_ratio: Optional[float] = None,
         attr: Optional[FootprintAttributes] = None,
         tedit: Optional[Uuid] = None,
         version: int = KICADET_VERSION,
