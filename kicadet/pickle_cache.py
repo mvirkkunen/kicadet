@@ -45,7 +45,11 @@ def load(path: Path | str, loader: Callable[[Path], Any]) -> Any:
     if not isinstance(path, Path):
         path = Path(path)
 
+    # Why does this cache not work
+    return loader(path)
+
     cache_path = get_cache_path(path)
+
     if not cache_path:
         return loader(path)
 
