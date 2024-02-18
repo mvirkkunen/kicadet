@@ -77,7 +77,9 @@ class BaseWire(Node):
             stroke: StrokeDefinition = NEW_INSTANCE,
             uuid: Uuid = NEW_INSTANCE,
     ):
-        pts = CoordinatePointList(pts)
+        if not isinstance(pts, CoordinatePointList):
+            pts = CoordinatePointList(pts)
+
         pts._set_parent(self)
 
         super().__init__(locals())
