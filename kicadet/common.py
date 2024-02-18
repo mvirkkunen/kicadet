@@ -129,7 +129,7 @@ class BaseRotate(ContainerNode):
             r += child.to_sexpr()
         return r
 
-class PaperSize(SymbolEnum):
+class PaperSize:
     A0 = "A0"
     A1 = "A1"
     A2 = "A2"
@@ -141,27 +141,29 @@ class PaperSize(SymbolEnum):
     C = "C"
     D = "D"
     E = "E"
+    User = "User"
 
 class PageSettings(Node):
     node_name = "paper"
 
+    paper_size: Annotated[Optional[str], Attr.Positional]
     width: Annotated[Optional[float], Attr.Positional]
     height: Annotated[Optional[float], Attr.Positional]
-    paper_size: Annotated[Optional[PaperSize], Attr.Positional]
 
     def __init__(
             self,
-            paper_size: Optional[PaperSize] = None,
+            paper_size: Optional[str] = PaperSize.A4,
             width: Optional[float] = None,
             height: Optional[float] = None
     ) -> None:
+        if (width is not None or height is not None) and paper_size == PaperSize.A4:
+            paper_size = PaperSize.User
+
         super().__init__(locals())
 
     def validate(self) -> None:
-        if not (
-                (self.width is not None and self.height is not None and self.paper_size is None)
-                or (self.width is None and self.height is None and self.paper_size is not None)):
-            raise ValueError("PageSettings must define either width and height, or paper_size, but not both.")
+        if (self.width is None) != (self.height is None):
+            raise ValueError("PageSettings must define both width and height if one is defined.")
 
 class Property(Node):
     node_name = "property"
