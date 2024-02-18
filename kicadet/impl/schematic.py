@@ -290,10 +290,12 @@ class SchematicFile(ContainerNode, NodeLoadSaveMixin):
             sym: symbol.Symbol,
             reference: str,
             at: Pos2,
+            mirror: Optional[Mirror] = None,
             footprint: Optional[str | LibraryFootprint] = None,
             in_bom: Optional[bool] = None,
             on_board: Optional[bool] = None,
-            dnp: bool = False
+            dnp: bool = False,
+            parent: Optional[ContainerNode] = None,
     ) -> SchematicSymbol:
         """
         Places a library symbol onto the schematic. If the symbol has not already been imported, it is automatically imported into lib_symbols.
@@ -312,6 +314,7 @@ class SchematicFile(ContainerNode, NodeLoadSaveMixin):
         ssym = SchematicSymbol(
             lib_id=lib_id,
             at=at,
+            mirror=mirror,
             unit=1,
             in_bom=sym.in_bom if in_bom is None else in_bom,
             on_board=sym.on_board if on_board is None else on_board,
@@ -335,11 +338,13 @@ class SchematicFile(ContainerNode, NodeLoadSaveMixin):
                     sprop.value = footprint
                 elif isinstance(footprint, LibraryFootprint):
                     sprop.value = f"{footprint.library_name}:{footprint.name}"
+            elif sprop.name == symbol.Property.Reference:
+                sprop.value = reference
 
-            sprop.at = Pos2(at) + sprop.at.flip_y()
+            sprop.at = Pos2(Vec2(at)) + sprop.at.flip_y()
             ssym.append(sprop)
 
-        self.append(ssym)
+        (parent or self).append(ssym)
 
         return ssym
 
