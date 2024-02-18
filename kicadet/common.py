@@ -1,9 +1,9 @@
 from enum import Flag, auto
 from typing import Annotated, Iterable, Optional, Self
 
-from . import sexpr
-from .node import *
-from .values import *
+from kicadet import sexpr
+from kicadet.node import *
+from kicadet.values import *
 
 class Generator(SymbolEnum):
     PcbNew = "pcbnew"

@@ -1,4 +1,4 @@
-from .impl.pcb import (
+from kicadet.impl.pcb import (
     Arc,
     Circle,
     GeneralSettings,

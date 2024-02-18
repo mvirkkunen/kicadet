@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import overload, Any, Optional, Tuple, TypeAlias
 
-from . import sexpr
+from kicadet import sexpr
 
 ToVec2: TypeAlias = "Vec2 | Pos2 | list[float] | Tuple[float, ...] | Tuple[()]"
 

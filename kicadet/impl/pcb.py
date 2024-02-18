@@ -1,12 +1,11 @@
 import copy
 from typing import overload, Annotated, ClassVar, Optional
 
-from ..node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
-from ..common import BaseRotate, BaseTransform, Generator, Layer, Net, PageSettings, PaperSize, Property, KICADET_GENERATOR, KICADET_VERSION
-from ..values import SymbolEnum, Pos2, ToPos2, ToVec2, Uuid, Vec2
-from .. import util
-from .schematic import SchematicSymbol
-from . import footprint as fp, symbol as sym
+from kicadet.node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
+from kicadet.common import BaseRotate, BaseTransform, Generator, Layer, Net, PageSettings, PaperSize, Property, KICADET_GENERATOR, KICADET_VERSION
+from kicadet.values import SymbolEnum, Pos2, ToPos2, ToVec2, Uuid, Vec2
+from kicadet import util
+from kicadet import footprint as fp, symbol as sym, schematic as sch
 
 class Transform(BaseTransform): pass
 

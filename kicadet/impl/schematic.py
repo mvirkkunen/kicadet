@@ -1,11 +1,11 @@
 import copy
 from typing import Annotated, Iterable, Optional
 
-from ..values import Pos2, Rgba, ToVec2, SymbolEnum, Uuid, Vec2
-from ..node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
-from ..common import BaseRotate, BaseTransform, CoordinatePoint, CoordinatePointList, Generator, PageSettings, PaperSize, Property, StrokeDefinition, TextEffects, KICADET_GENERATOR, KICADET_VERSION
-from .footprint import LibraryFootprint
-from . import symbol
+from kicadet.values import Pos2, Rgba, ToVec2, SymbolEnum, Uuid, Vec2
+from kicadet.node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
+from kicadet.common import BaseRotate, BaseTransform, CoordinatePoint, CoordinatePointList, Generator, PageSettings, PaperSize, Property, StrokeDefinition, TextEffects, KICADET_GENERATOR, KICADET_VERSION
+from kicadet.footprint import LibraryFootprint
+from kicadet import symbol
 
 class Junction(Node):
     node_name = "junction"

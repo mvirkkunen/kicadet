@@ -1,10 +1,10 @@
 from pathlib import Path
-from typing import overload, runtime_checkable, Annotated, Optional, Protocol
+from typing import overload, Annotated, Optional
 
-from ..common import BaseTransform, BaseRotate, CoordinatePointList, Generator, Net, Property, StrokeDefinition, TextEffects, ToCoordinatePointList, Uuid, KICADET_GENERATOR, KICADET_VERSION
-from ..node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
-from ..values import SymbolEnum, Pos2, ToPos2, ToVec2, ToVec3, Vec2, Vec3
-from .. import sexpr, util
+from kicadet.common import BaseTransform, BaseRotate, CoordinatePointList, Generator, Net, Property, StrokeDefinition, TextEffects, ToCoordinatePointList, Uuid, KICADET_GENERATOR, KICADET_VERSION
+from kicadet.node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
+from kicadet.values import SymbolEnum, Pos2, ToPos2, ToVec2, ToVec3, Vec2, Vec3
+from kicadet import sexpr, util
 
 class Transform(BaseTransform):
     pass

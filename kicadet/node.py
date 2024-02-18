@@ -7,8 +7,8 @@ from functools import cache
 import typing
 from typing import Any, Callable, ClassVar, Annotated, Optional, Protocol, Self, TypeAlias, TypeVar, Union
 
-from . import pickle_cache, sexpr, util
-from .values import Pos2, ToPos2, Uuid
+from kicadet import pickle_cache, sexpr, util
+from kicadet.values import Pos2, ToPos2, Uuid
 
 class NewInstance: pass
 NEW_INSTANCE: Any = NewInstance()

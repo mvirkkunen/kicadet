@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from typing import Any, Callable,TypeVar
-from .values import Vec2
+from kicadet.values import Vec2
 
 _T = TypeVar("_T")
 

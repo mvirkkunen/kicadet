@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import overload, ClassVar, Annotated, Optional
 
-from ..values import Pos2, SymbolEnum, Vec2, ToVec2
-from ..common import BaseRotate, BaseTransform, CoordinatePoint, CoordinatePointList, FillDefinition, Generator, StrokeDefinition, TextEffects, KICADET_VERSION, KICADET_GENERATOR
-from ..node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
-from .. import util
+from kicadet.values import Pos2, SymbolEnum, Vec2, ToPos2, ToVec2
+from kicadet.common import BaseRotate, BaseTransform, CoordinatePoint, CoordinatePointList, FillDefinition, Generator, StrokeDefinition, TextEffects, KICADET_VERSION, KICADET_GENERATOR
+from kicadet.node import Attr, ContainerNode, Node, NodeLoadSaveMixin, NEW_INSTANCE
+from kicadet import util
 
 class Property(Node):
     node_name = "property"

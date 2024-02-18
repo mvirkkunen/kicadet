@@ -1,4 +1,4 @@
-from .impl.symbol import(
+from kicadet.impl.symbol import(
     Arc,
     Bezier,
     Circle,

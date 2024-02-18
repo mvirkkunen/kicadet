@@ -1,4 +1,4 @@
-from .impl.footprint import (
+from kicadet.impl.footprint import (
     Arc,
     Circle,
     DrillDefinition,
