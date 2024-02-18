@@ -70,9 +70,21 @@ class Vec2:
     def length(self) -> float:
         return (self.x**2 + self.y**2)**0.5
 
-    def __add__(self, other: "Vec2") -> "Vec2":
+    def __add__(self, other: "ToVec2") -> "Vec2":
         other = Vec2(other)
         return Vec2(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other: "ToVec2") -> "Vec2":
+        return self + (-Vec2(other))
+
+    def __neg__(self) -> "Vec2":
+        return Vec2(-self.x, -self.y)
+
+    def __mul__(self, other: int | float) -> "Vec2":
+        return Vec2(self.x * other, self.y * other)
+
+    def __div__(self, other: int | float) -> "Vec2":
+        return self * (1 / other)
 
 ToPos2: TypeAlias = "ToVec2 | Tuple[float, ...]"
 
@@ -162,6 +174,12 @@ class Pos2:
 
     def __neg__(self) -> "Pos2":
         return Pos2(-self.x, -self.y, -self.r)
+
+    def __mul__(self, other: int | float) -> "Pos2":
+        return Pos2(self.x * other, self.y * other, self.r)
+
+    def __div__(self, other: int | float) -> "Pos2":
+        return self * (1 / other)
 
 ToVec3: TypeAlias = "Vec3 | Vec2 | Pos2 | list[float] | Tuple[float, ...] | Tuple[()]"
 
