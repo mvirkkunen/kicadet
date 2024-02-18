@@ -95,7 +95,7 @@ class BaseTransform(ContainerNode):
     def __init__(
             self,
             at: ToPos2,
-            children: Optional[list[Node]] = None,
+            children: Optional[list[Node] | Node] = None,
             parent: Optional[Node] = None):
         super().__init__(locals())
 
@@ -116,7 +116,7 @@ class BaseRotate(ContainerNode):
     def __init__(
             self,
             angle: float,
-            children: Optional[list[Node]] = None,
+            children: Optional[list[Node] | Node] = None,
             parent: Optional[Node] = None):
         super().__init__(locals())
 

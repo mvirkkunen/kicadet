@@ -2,7 +2,7 @@ import copy
 import enum
 from pathlib import Path
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterable, Iterator, Sequence
 from functools import cache
 import typing
 from typing import Any, Callable, ClassVar, Annotated, Optional, Protocol, Self, TypeAlias, TypeVar, Union
@@ -393,9 +393,12 @@ class ContainerNode(Node):
         super()._init(attrs)
 
         if children:
-            assert isinstance(children, list)
-            for child in children:
-                self.append(child)
+            if isinstance(children, Node):
+                self.append(children)
+            else:
+                assert isinstance(children, Sequence)
+                for child in children:
+                    self.append(child)
 
     def clone(self) -> Self:
         """
