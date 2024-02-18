@@ -273,7 +273,7 @@ class TrackVia(Node):
             at: ToVec2,
             size: float,
             drill: float,
-            net: int | Net,
+            net: int | Net = 0,
             layers: ViaLayers = NEW_INSTANCE,
             type: Optional[ViaType] = None,
             locked: bool = False,
