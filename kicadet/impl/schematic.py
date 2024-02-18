@@ -205,6 +205,25 @@ class SchematicSymbol(ContainerNode):
 
         return self.transform_pos(self.at) + self.transform_pos(pin.at.flip_y())
 
+    def set_property(self, name: str, value: str) -> None:
+        prop = self.find_one(symbol.Property, lambda p: p.name == name)
+        if prop:
+            prop.value = value
+        else:
+            self.append(symbol.Property(
+                name,
+                value,
+                (0, 0),
+                TextEffects(hide=True),
+            ))
+
+    def get_property(self, name: str) -> Optional[str]:
+        prop = self.find_one(symbol.Property, lambda p: p.name == name)
+        if not prop:
+            return None
+
+        return prop.value
+
     @property
     def pins(self) -> Iterable[SchematicSymbolPin]:
         return self.find_all(SchematicSymbolPin)
