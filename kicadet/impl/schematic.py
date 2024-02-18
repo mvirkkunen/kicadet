@@ -10,7 +10,7 @@ from . import symbol
 class Junction(Node):
     node_name = "junction"
 
-    at: Vec2
+    at: Annotated[Vec2, Attr.Transform]
     diameter: float
     color: Rgba
     uuid: Uuid
@@ -27,7 +27,7 @@ class Junction(Node):
 class NoConnect(Node):
     node_name = "no_connect"
 
-    at: Vec2
+    at: Annotated[Vec2, Attr.Transform]
     uuid: Uuid
 
     def __init__(
@@ -52,7 +52,7 @@ class GlobalLabel(ContainerNode):
     shape: LabelShape
     fields_autoplaced: Annotated[bool, Attr.Bool.SymbolInList]
     effects: TextEffects
-    at: Pos2
+    at: Annotated[Pos2, Attr.Transform]
     uuid: Uuid
 
     def __init__(
@@ -77,6 +77,9 @@ class BaseWire(Node):
             stroke: StrokeDefinition = NEW_INSTANCE,
             uuid: Uuid = NEW_INSTANCE,
     ):
+        pts = CoordinatePointList(pts)
+        pts._set_parent(self)
+
         super().__init__(locals())
 
 class Wire(BaseWire):
@@ -206,8 +209,8 @@ class SchematicSymbol(ContainerNode):
     def pins(self) -> Iterable[SchematicSymbolPin]:
         return self.find_all(SchematicSymbolPin)
 
-Transform.child_types = (symbol.Property, SchematicSymbol, Transform, Rotate)
-Rotate.child_types = (symbol.Property, SchematicSymbol, Transform, Rotate)
+Transform.child_types = (symbol.Property, SchematicSymbol, Junction, NoConnect, Wire, Bus, Transform, Rotate)
+Rotate.child_types = (symbol.Property, SchematicSymbol, Junction, NoConnect, Wire, Bus, Transform, Rotate)
 
 class SchematicLibSymbols(ContainerNode):
     node_name = "lib_symbols"
